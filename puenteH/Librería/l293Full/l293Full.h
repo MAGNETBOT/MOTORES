@@ -12,13 +12,15 @@
 class l293Full
 {
   public:
+	
 	l293Full(int pin1,int pin2,int pin3,int pin4,int pin5,int pin6);
-    void motorsUp();   
-    void motorsDown();
-    state checkState(state s1);
+	int duty_cycle;
+	void motorsUp();   
+	void motorsDown();
+	state checkState(state s1);
 	void M1_F(int dc);
-    void M1_R(int dc);
-    void M2_F(int dc);
+	void M1_R(int dc);
+	void M2_F(int dc);
     void M2_R(int dc);
     void forward(int dc);
     void reverse(int dc);

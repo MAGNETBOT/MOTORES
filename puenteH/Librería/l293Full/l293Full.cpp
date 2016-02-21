@@ -23,6 +23,7 @@ l293Full::l293Full(int pin1,int pin2,int pin3,int pin4,int pin5,int pin6)
   _en1 = pin5;
    pinMode(pin6, OUTPUT);
   _en2 = pin6;
+  duty_cycle=255;
 }
 
 void l293Full::motorsUp(){
@@ -40,27 +41,69 @@ state l293Full::checkState(state s1){
 }
 
 void l293Full::M1_F(int dc){
+   int DutyCycle=dc;
    digitalWrite(_logic1,LOW);
-   analogWrite(_logic2,dc);
-   _state1= FORWARD;
+   analogWrite(_logic2,DutyCycle);
+   
+	if (DutyCycle >=253){
+		analogWrite(_logic2,255);
+		duty_cycle=255;
+	}
+	else{
+		analogWrite(_logic2,DutyCycle);
+		delay(2);
+		M1_F(DutyCycle+2);
+	}
+	_state1= FORWARD;
 }
 
 void l293Full::M2_F(int dc){
+   int DutyCycle=dc;
    digitalWrite(_logic3,LOW);
-   analogWrite(_logic4,dc);
+   analogWrite(_logic4,DutyCycle);
+	if (DutyCycle >=253){
+		analogWrite(_logic4,255);
+		duty_cycle=255;
+	}
+	else{
+		analogWrite(_logic4,DutyCycle);
+		delay(2);
+		M2_F(DutyCycle+2);
+	}
    _state2= FORWARD;
 }
+
 void l293Full::M1_R(int dc){
-   int DC=255-dc;
+   int DutyCycle=255-dc;
    digitalWrite(_logic1,HIGH);
-   analogWrite(_logic2,DC);
+   analogWrite(_logic2,DutyCycle);
+   
+	if (DutyCycle <=2){
+		analogWrite(_logic2,0);
+		duty_cycle=255;
+	}
+	else{
+		analogWrite(_logic2,DutyCycle);
+		delay(2);
+		M1_R(DutyCycle-2);
+	}
    _state1= REVERSE;
 }
 
 void l293Full::M2_R(int dc){
-   int DC=255-dc;
+   int DutyCycle=255-dc;;
    digitalWrite(_logic3,HIGH);
-   analogWrite(_logic4,DC);
+   analogWrite(_logic4,DutyCycle);
+   
+	if (DutyCycle <=2){
+		analogWrite(_logic4,0);
+		duty_cycle=255;
+	}
+	else{
+		analogWrite(_logic4,DutyCycle);
+		delay(2);
+		M2_R(DutyCycle-2);
+	}
    _state2= REVERSE;
 }
 
@@ -114,21 +157,23 @@ void l293Full::brakeM1(int dc){
 		int DutyCycle=dc;
 		if (DutyCycle <=2){
 			analogWrite(_logic2,0);
+			duty_cycle=0;
 		}
 		else{
 			analogWrite(_logic2,DutyCycle);
-			delay(5);
+			delay(2);
 			brakeM1(DutyCycle-2);
 		}
 	}
 	else{
-		int DutyCycle= 255-DutyCycle;
+		int DutyCycle= 255-dc;
 		if (DutyCycle >=253){
 			analogWrite(_logic2,255);
+			duty_cycle=0;
 		}
 		else{
 			analogWrite(_logic2,DutyCycle);
-			delay(5);
+			delay(2);
 			brakeM1(DutyCycle+2);
 		}
 	}
@@ -140,10 +185,11 @@ void l293Full::brakeM2(int dc){
 		int DutyCycle=dc;
 		if (DutyCycle <=2){
 			analogWrite(_logic4,0);
+			duty_cycle=0;
 		}
 		else{
 			analogWrite(_logic4,DutyCycle);
-			delay(5);
+			delay(2);
 			brakeM2(DutyCycle-2);
 		}
 	}
@@ -151,10 +197,11 @@ void l293Full::brakeM2(int dc){
 		int DutyCycle= 255-DutyCycle;
 		if (DutyCycle >=253){
 			analogWrite(_logic4,255);
+			duty_cycle=0;
 		}
 		else{
 			analogWrite(_logic4,DutyCycle);
-			delay(5);
+			delay(2);
 			brakeM2(DutyCycle+2);
 		}
 	}
